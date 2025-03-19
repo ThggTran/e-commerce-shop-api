@@ -1,22 +1,29 @@
+from jsonschema import ValidationError
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+
+from user.permissions import  IsCustomer, IsSellerOrAdmin
 
 from core.models import Tag, Product, Category
 from product import serializers
+
+
 
 
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductDetailSerializer
     queryset = Product.objects.all()
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSellerOrAdmin]
 
     
     def get_queryset(self):
+        if self.action in ['list', 'retrieve']:
+            return self.queryset.order_by('-id')
+
         return self.queryset.filter(user=self.request.user).order_by('-id')
     
     def get_serializer_class(self):
@@ -28,7 +35,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         return self.serializer_class
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        if self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+        else:
+            raise ValidationError("Authentication credentials were not provided.")
 
     @action(methods=['POST'], detail=True, url_path='upload_image')
     def upload_image(self, request, pk=None):
@@ -41,29 +51,24 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class BaseProductAttrViewSet(mixins.DestroyModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.ListModelMixin,
-                            viewsets.GenericViewSet):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by('-name')
     
-class TagViewSet(BaseProductAttrViewSet):
+class TagViewSet(viewsets.ModelViewSet):
 
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSellerOrAdmin]
 
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user).order_by('-id')
 
-class CategoryViewSet(BaseProductAttrViewSet,
-                      mixins.CreateModelMixin):
+class CategoryViewSet(viewsets.ModelViewSet):
     
     serializer_class = serializers.CategorySerializer
     queryset = Category.objects.all()
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSellerOrAdmin]
 
     def get_queryset(self):
         return self.queryset.order_by('-name')

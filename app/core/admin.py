@@ -16,6 +16,7 @@ class UserAdmin(BaseUserAdmin):
                     'is_active',
                     'is_staff',
                     'is_superuser',
+                    'role',
                 )
             }
         ),
@@ -33,6 +34,7 @@ class UserAdmin(BaseUserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
+                'role',
             )
         }),
     )
