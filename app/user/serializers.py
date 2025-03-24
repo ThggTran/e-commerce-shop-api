@@ -31,7 +31,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # Custom payload JWT (optional)
         token['email'] = user.email
         token['name'] = user.name
         token['is_staff'] = user.is_staff
