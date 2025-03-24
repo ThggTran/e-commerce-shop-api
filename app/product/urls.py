@@ -13,4 +13,5 @@ app_name = 'product'
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('product/<str:name>/', views.ProductReviewViewSet.as_view(), name='product-review'),
 ]

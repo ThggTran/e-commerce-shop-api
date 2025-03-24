@@ -1,7 +1,8 @@
 from jsonschema import ValidationError
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
@@ -11,7 +12,17 @@ from user.permissions import  IsCustomer, IsSellerOrAdmin
 from core.models import Tag, Product, Category
 from product import serializers
 
+from product.paginations import ProductPagination
 
+class ProductReviewViewSet(generics.ListAPIView):
+    serializer_class = serializers.ProductDetailSerializer
+    queryset = Product.objects.all()
+
+    def get_queryset(self):
+        product_name = self.kwargs.get('name')
+        return self.queryset.filter(name=product_name)
+    
+    
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -19,6 +30,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSellerOrAdmin]
+
+    pagination_class = ProductPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'brand', 'model']
 
     
     def get_queryset(self):

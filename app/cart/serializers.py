@@ -2,13 +2,13 @@ from rest_framework import serializers
 
 from core.models import CartItem, Cart, Product
 
-class ProductSerializer(serializers.ModelSerializer):
+class CartProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id','name', 'price']
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    product = CartProductSerializer()
 
     class Meta:
         model = CartItem
@@ -25,7 +25,7 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'created_at', 'items', 'total_price']
         read_only_fields = ['id', 'created_at']
     
-    def get_total_price(self, obj):
+    def get_total_price(self, obj)-> float:
         return obj.get_total_price()
 
 

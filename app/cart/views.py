@@ -11,7 +11,7 @@ from cart import serializers
 from user.permissions import  IsCustomer, IsSellerOrAdmin
 
 from core.models import Cart, CartItem, Product
-from drf_spectacular.utils import extend_schema
+
 
 
 class CartItemViewSet(viewsets.GenericViewSet):
