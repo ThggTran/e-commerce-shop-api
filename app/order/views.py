@@ -21,13 +21,11 @@ class OrderViewSet(viewsets.GenericViewSet):
         if not cart_items.exists():
             return Response({'error': 'Your cart is empty.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Tạo Order mới
         order = Order.objects.create(user=user)
 
         order_items = []
         total_price = 0
 
-        # Auto chuyển toàn bộ CartItem -> OrderItem
         for item in cart_items:
             order_item = OrderItem(
                 order=order,
@@ -38,13 +36,13 @@ class OrderViewSet(viewsets.GenericViewSet):
             order_items.append(order_item)
             total_price += item.product.price * item.quantity
 
-        OrderItem.objects.bulk_create(order_items)  # Tạo nhiều dòng 1 lần
+        OrderItem.objects.bulk_create(order_items)
 
-        # Cập nhật tổng tiền cho Order
+        
         order.total_price = total_price
         order.save()
 
-        # Xóa giỏ hàng
+        
         cart.items.all().delete()
 
         return Response({

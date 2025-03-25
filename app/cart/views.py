@@ -1,14 +1,10 @@
 from django.shortcuts import get_object_or_404
-from jsonschema import ValidationError
-from rest_framework import viewsets, mixins, status
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
 
 from cart import serializers
-from user.permissions import  IsCustomer, IsSellerOrAdmin
 
 from core.models import Cart, CartItem, Product
 
@@ -16,8 +12,7 @@ from core.models import Cart, CartItem, Product
 
 class CartItemViewSet(viewsets.GenericViewSet):
     serializer_class = serializers.CartSerializer
-    queryset = Cart.objects.none()
-    authentication_classes = [TokenAuthentication]
+    queryset = Cart.objects.all()
     permission_classes = [IsAuthenticated]
 
 

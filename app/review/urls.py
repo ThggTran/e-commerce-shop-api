@@ -1,11 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CartItemViewSet
+from .views import ReviewViewSet
 
 router = DefaultRouter()
-router.register(r'cart', CartItemViewSet)
+router.register('products/(?P<product_id>\d+)/reviews', ReviewViewSet, basename='product-reviews')
 
-app_name = 'cart'
+app_name = 'review'
 
 urlpatterns = [
     path('', include(router.urls)),

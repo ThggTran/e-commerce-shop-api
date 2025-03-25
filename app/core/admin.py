@@ -8,7 +8,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ['id']
     list_display = ['email', 'name']
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('name','email', 'password')}),
         (
             _('Permissions'),
             {
@@ -48,3 +48,4 @@ admin.site.register(models.Cart)
 admin.site.register(models.CartItem)
 admin.site.register(models.Order)
 admin.site.register(models.OrderItem)
+admin.site.register(models.Review)
